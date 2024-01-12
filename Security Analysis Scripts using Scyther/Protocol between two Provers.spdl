@@ -1,0 +1,48 @@
+/* 
+ * Protocol between two Provers
+ */
+
+// The protocol description
+hashfunction h;
+usertype  Timestamp; 
+usertype  Identity;
+protocol  Provers(ProverI,ProverJ)
+{
+	role ProverI
+	{
+		fresh ti: Timestamp;
+		var tr: Timestamp;
+		fresh pidi:Identity;
+		fresh Ni:Nonce;
+		var nr:Nonce;
+		send_1(ProverI,ProverJ, Ni,ti,pidi,{Ni,ti,pidi}k(ProverI,ProverJ),{ti}sk(ProverI) );
+		recv_2(ProverJ,ProverI, nr,tr,h(k(ProverI,ProverJ),nr,tr,pidi),{tr}sk(ProverJ) );
+
+
+		claim(ProverI,Alive);
+		claim(ProverI,Weakagree);
+
+		claim(ProverI,Niagree);
+		claim(ProverI,Nisynch);
+	}	
+	
+	role ProverJ
+	{
+		var ti: Timestamp;		var Ni:Nonce;
+		fresh tr: Timestamp;
+		var pidi:Identity;
+
+		fresh nr:Nonce;
+		recv_1(ProverI,ProverJ, Ni,ti,pidi,{Ni,ti,pidi}k(ProverI,ProverJ),{ti}sk(ProverI) );
+		send_2(ProverJ,ProverI, nr,tr,h(k(ProverI,ProverJ),nr,tr,pidi),{tr}sk(ProverJ) );
+	
+
+	
+		claim(ProverJ,Alive);
+		claim(ProverJ,Weakagree);
+
+		claim(ProverJ,Niagree);
+		claim(ProverJ,Nisynch);
+	}
+}
+

@@ -1,0 +1,48 @@
+/* 
+ * Protocol between Verifier and Prover
+ */
+
+// The protocol description
+
+hashfunction h;
+usertype  Timestamp; 
+
+usertype  Identity;
+protocol Verifiers(Verifier,Prover)
+{
+	role Verifier
+	{
+		fresh ti: Timestamp;
+		var tr: Timestamp;
+		fresh pidi:Identity;
+
+		var nr:Nonce;
+		send_1(Verifier,Prover, ti,pidi,{ti,pidi}sk(Verifier),{ti}sk(Verifier) );
+		recv_2(Prover,Verifier, nr,tr,h(k(Verifier,Prover),nr,tr,pidi),{tr}sk(Prover) );
+
+
+		claim(Verifier,Alive);
+		claim(Verifier,Weakagree);
+
+		claim(Verifier,Niagree);
+		claim(Verifier,Nisynch);
+	}	
+	
+	role Prover
+	{
+		var ti: Timestamp;
+
+		fresh tr: Timestamp;
+
+		var pidi:Identity;
+
+
+		fresh nr:Nonce;
+		recv_1(Verifier,Prover, ti,pidi,{ti,pidi}sk(Verifier),{ti}sk(Verifier) );
+		send_2(Prover,Verifier, nr,tr,h(k(Verifier,Prover),nr,tr,pidi),{tr}sk(Prover) );
+	
+
+
+	}
+}
+
